@@ -2,17 +2,48 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const {dbConnectMySql} = require('./config/mysql');
+require('./models/association');
+const path = require('path');
 
+//Swagger
+const swaggerUI = require('swagger-ui-express');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerSpec = {
+    definition: {
+        openapi: "3.0.0",
+        info: {
+            title: "Disney Proyect Node",
+            version: "1.0.0"
+        },
+        servers: [
+            {
+                url: "http://localhost:3001"
+            }
+        ]
+    },
+    apis: [`${path.join(__dirname, "./routes/*.js")}`]
+};
+
+//Settings
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+//Middlewares
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
-
+//Routes
 app.use('/api', require('./routes'));
+app.use(
+    '/api-doc', 
+    swaggerUI.serve, 
+    swaggerUI.setup(swaggerJsDoc(swaggerSpec))
+    );
+
 
 app.listen(PORT, () => {
     console.log(`Server listen port ${PORT}`);
 });
 
+//MySql connection
 dbConnectMySql(); 

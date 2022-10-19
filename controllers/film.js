@@ -1,6 +1,9 @@
 const FilmModel = require('../models/mysql/film');
 const {matchedData} = require('express-validator');
 const {handdleError} = require('../utils/handdleError');
+const GenreModel = require('../models/mysql/genre');
+const Storage = require('../models/mysql/storage');
+const CharacterModel = require('../models/mysql/character');
 
 /**
  * List films
@@ -9,11 +12,19 @@ const {handdleError} = require('../utils/handdleError');
  */
 const getFilms = async (req, res) => {
     try {
-        const data = await FilmModel.findAll();
+        const data = await FilmModel.findAll({
+            include:[{
+                model: Storage, 
+                as: 'image',
+                attributes: ['url', 'filename']
+            }],
+            attributes: ['title', 'creation_date']
+        });
+
         res.send({data});
     } catch (err) {
         console.log(err);
-        handdleError(res, 'ERROR_GET_FILMS', )
+        handdleError(res, 'ERROR_GET_FILMS', 400)
     }
 };
 
@@ -26,15 +37,26 @@ const getFilms = async (req, res) => {
 const getFilm = async (req, res) => {
     try {
         const { id } = req.params;
-        const data = await FilmModel.findAll({where: {id}, include: 'character_film'});
+
+        const data = await FilmModel.findAll({
+            where: {id}, 
+            include:[{
+                model: CharacterModel, 
+                as: 'characters',
+                attributes: ['name', 'age', 'weight', 'history']
+            }],
+            attributes: ['title', 'creation_date', 'calification']
+        });
+
         if(!data){
             handdleError(res, 'NOT_FOUND', 404);
             return;
-        }
+        };
+
         res.send({data});
     } catch (err) {
         console.log({err});
-        handdleError(res, 'ERROR_GET_FILM', );
+        handdleError(res, 'ERROR_GET_FILM', 400);
     }
 };
 
@@ -46,11 +68,11 @@ const getFilm = async (req, res) => {
 const createFilm = async (req, res) => {
     try {
         const {body} = req;
-        const data = await FilmModel.create(body, {include: 'characters'});
+        const data = await FilmModel.create(body, {include: {model: CharacterModel, as:'characters'}});
         res.send(data);
     } catch (err) {
         console.log({err});
-        handdleError(res, 'ERROR_CREATE_CHARACTER');
+        handdleError(res, 'ERROR_CREATE_FILM', 400);
     }
 };
 
@@ -63,7 +85,7 @@ const createFilm = async (req, res) => {
 const updateFilm = async (req, res) => {
     try {
         const {id} = req.params;
-        const {title, creation_date, calification} = req.body;
+        const {title, creation_date, calification, mediaId, genre_id} = req.body;
 
         
         const foundData = await FilmModel.findByPk(id);
@@ -74,12 +96,14 @@ const updateFilm = async (req, res) => {
         if(title) foundData.title = title;
         if(creation_date) foundData.creation_date = creation_date;
         if(calification) foundData.calification = calification;
+        if(mediaId) foundData.mediaId = mediaId;
+        if(genre_id) foundData.genre_id = genre_id;
 
         const data = await foundData.save();
         res.send({data});
     } catch (err) {
         console.log(err);
-        handdleError(res, 'ERROR_UPDATE_CHARACTER');
+        handdleError(res, 'ERROR_UPDATE_FILM', 400);
     }
 };
 
@@ -95,7 +119,7 @@ const deleteFilm = async (req, res) =>{
         res.send({data});
     } catch (err) {
         console.log(err);
-        handdleError(res, 'ERROR_DELETE_CHARACTER');
+        handdleError(res, 'ERROR_DELETE_FILM');
     }
 };
 

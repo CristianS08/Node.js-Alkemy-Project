@@ -2,6 +2,7 @@ const UserModel = require('../models/mysql/user');
 const {encrypt, compare} = require('../utils/handlePassword.js');
 const { tokenSign } = require('../utils/handleJwt');
 const {handdleError} = require('../utils/handdleError');
+const sendMail = require('../config/emailer');
 
 const registerCtrl = async (req, res) =>{
     try {
@@ -15,10 +16,12 @@ const registerCtrl = async (req, res) =>{
             token: await tokenSign(dataUser),
             user: dataUser
         };
+
+        sendMail(dataUser);
         res.send({data});
     } catch (error) {
         console.log(error);
-        handdleError(res, 'ERROR_REGISTER_USER');
+        handdleError(res, 'ERROR_REGISTER_USER', 400);
     }
 };
 
@@ -50,7 +53,7 @@ const loginCtrl = async (req, res) => {
     
     } catch (err) {
         console.log(err);
-        handdleError(res, 'ERROR_LOGIN_USER', 404);
+        handdleError(res, 'ERROR_LOGIN_USER', 400);
     }
 }
 

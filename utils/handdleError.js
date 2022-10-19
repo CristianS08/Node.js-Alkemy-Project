@@ -4,7 +4,7 @@
  * @param message 
  * @param code 
  */
-const handdleError = (res, message, code = 403) => {
+const handdleError = (res, message, code = 400) => {
     res.status(code);
     res.send({error: message});
 };

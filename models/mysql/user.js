@@ -1,7 +1,7 @@
 const {sequelize} = require('../../config/mysql');
-const {DataTypes} = require('sequelize');
+const {DataTypes, Model} = require('sequelize');
 
-const UserModel = sequelize.define(
+/* const UserModel = sequelize.define(
     'user',
     {
         name: {
@@ -25,6 +25,34 @@ const UserModel = sequelize.define(
     {
         timestamps: true
     }
-);
+); */
+
+class UserModel extends Model{};
+UserModel.init(
+    {
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        age: {
+            type: DataTypes.INTEGER
+        },
+        email: {
+            type: DataTypes.STRING
+        },
+        password: {
+            type: DataTypes.STRING
+        },
+        role: {
+            type: DataTypes.ENUM(['user', 'admin']),
+            defaultValue:'user'
+        }
+    },
+    {
+        sequelize,
+        modelName: 'user',
+        timestamps: true
+    }
+)
 
 module.exports = UserModel;
