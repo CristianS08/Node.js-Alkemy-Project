@@ -2,7 +2,7 @@ require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const {dbConnectMySql} = require('./config/mysql');
-require('./models/association');
+require('./src/models/association');
 const path = require('path');
 
 //Swagger
@@ -21,7 +21,7 @@ const swaggerSpec = {
             }
         ]
     },
-    apis: [`${path.join(__dirname, "./routes/*.js")}`]
+    apis: [`${path.join(__dirname, "./src/routes/*.js")}`]
 };
 
 //Settings
@@ -33,7 +33,7 @@ app.use(cors());
 app.use(express.json());
 
 //Routes
-app.use('/api', require('./routes'));
+app.use('/api', require('./src/routes'));
 app.use(
     '/api-doc', 
     swaggerUI.serve, 

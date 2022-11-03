@@ -1,4 +1,4 @@
- const {sequelize} = require('../../config/mysql');
+ const {sequelize} = require('../../../config/mysql');
  const {DataTypes, Model} = require('sequelize');
  const Character_film = require('./character_film');
  const Storage = require('./storage');

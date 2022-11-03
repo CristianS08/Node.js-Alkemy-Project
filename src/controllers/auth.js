@@ -2,7 +2,7 @@ const UserModel = require('../models/mysql/user');
 const {encrypt, compare} = require('../utils/handlePassword.js');
 const { tokenSign } = require('../utils/handleJwt');
 const {handdleError} = require('../utils/handdleError');
-const sendMail = require('../config/emailer');
+const sendMail = require('../../config/emailer');
 
 const registerCtrl = async (req, res) =>{
     try {
